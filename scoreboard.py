@@ -45,11 +45,6 @@ class ScoreBoard:
         To keep track on history, we only add a payback entry to scoreboard but
         not actually delete the user
         """
-        refresh()
-        paybackName = "Payback of " + userName
-        # Create a fresh entry of payback
-        payback = FreshEntry(paybackName, self.name)
-
 
     def refresh(self):
         """
@@ -72,14 +67,9 @@ class ScoreBoard:
         """
         Add an entry to scoreboard
         """
-        if not FreshEntry.checkEntry(entryValue):
-            print "illegal entry!"
-            return -1
-
-        usersInvolved = entryValue.keys()
-        
+        usersInvolved = entry.keys()
         for user in usersInvolved:
-            self.data[user][entryName] = entryValue[user]
+            self.data[user][entryName] = entry[user][0]
 
         return 0
 
@@ -88,14 +78,18 @@ class ScoreBoard:
         return a user's state
         """
 
-    def hasUser(userName):
+    def hasUser(self, userName):
         """
         return True is user exist
         if yes, return user and user data
         if no, return None
         """
+        if self.data.has_key(userName):
+            return True
+        else:
+            return False
 
-    def hasEntry(entryName):
+    def hasEntry(self, entryName):
         """
         Check whether the scoreboard contains an specific entry
         If yes, return the entry as dict
@@ -116,7 +110,7 @@ class FreshEntry:
         currentTime = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         self.name = entryName + "|" + currentTime
         self.scoreBoardName = scoreBoardName
-        self.entry = {}
+        self.data = {}
 
     def checkEntry(self, entryValue):
         """
@@ -124,15 +118,26 @@ class FreshEntry:
         TODO: should be implemented at user end?
         """
 
-    def confirm(userName):
+    def confirm(self, userName):
         """
-        Confirm a shared expenditure
+        Confirm a shared expenditure for an user
         """
+        if self.hasUser(userName):
+            
 
     def commitEntry(self):
         """
         Entry is complete, add to scoreboard
         """
+
+    def hasUser(self, userName):
+        """
+        check user existance
+        """
+        if self.data.has_key(userName):
+            return True
+        else:
+            return False
 
 if __name__=="__main__":
     test = ScoreBoard("test")
