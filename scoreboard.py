@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 from time import strftime, gmtime
+import json
 
 class ScoreBoard:
 
@@ -22,10 +23,12 @@ class ScoreBoard:
                 }
             }
     """
-    def __init__(self, name):
+    def __init__(self, name, people = []):
         self.name = name
         self.data = {}
         self.summary = {}
+        for usr in people:
+            self.summary[usr] = 0
         print "instantiate scoreboard: " + name
 
     def addMember(self, userName):
@@ -184,6 +187,14 @@ class FreshEntry:
 
         return 0
 
+    def _autoConfirm(self):
+        """
+        confirm for every fucking user!
+        """
+        for user in self.data:
+            self.confirm(user)
+        return 0
+
     def hasUser(self, userName):
         """
         check user existance
@@ -217,6 +228,14 @@ if __name__=="__main__":
     if entry.entryIsComplete():
         test.addEntry(entry)
     print test.summary
+    encoded = json.dumps(test.data, sort_keys=True, indent = 4, separators = (',',';'))
+    print encoded
+    f = open("test.json",'w')
+    f.write(encoded)
+    f.close()
     test.clearUp()
 
-    
+    f = open("test.json",'r')
+    decoded = json.loads(f.read())
+    print decoded
+
