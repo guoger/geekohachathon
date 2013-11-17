@@ -15,6 +15,7 @@ def createNewSB(msg):
     SBs[name] = sb.ScoreBoard(name, users)
     print SBs[name].summary
     print SBs[name].data
+    return "Scoreboard "+name+" has been created!\n"
 
 def addEntry(msg):
     """
@@ -39,6 +40,19 @@ def addEntry(msg):
         SBs.get(SBName).addEntry(entry)
         print SBs.get(SBName).showState()
 
+    return "Entry "+entryName+" has been added!\n"
+
+def clean(msg):
+    """
+    clean up a score board, return payback result
+    """
+    result = ""
+    SBName = msg.get("SBName")
+    if SBs.has_key(SBName):
+        result = SBs[SBName].clearUp()
+        SBs.pop(SBName)
+    return result
+
 def connHandler(conn):
     """
     handling a connection, parse Json message and update scoreboard accordingly
@@ -52,6 +66,8 @@ def connHandler(conn):
             createNewSB(msg)
         elif msgType == "addEntry":
             addEntry(msg)
+        elif msgType == "clean":
+            conn.send(clean(msg))
         else:
             print "unknown type of message"
 

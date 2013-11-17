@@ -148,6 +148,7 @@ class ScoreBoard:
         """
         self.refresh()
         diff = 0
+        result = ""
         while self.summary:
             winner = max(self.summary, key = lambda x: self.summary.get(x))
             loser = min(self.summary, key = lambda x: self.summary.get(x))
@@ -156,16 +157,19 @@ class ScoreBoard:
                 self.summary[winner] = diff
                 handover = self.summary.pop(loser)
                 print str(loser) + " --> " + str(winner) + ": " + str(abs(handover))
+                result += str(loser)+" --> "+str(winner)+": "+str(abs(handover))+"\n"
             elif diff < 0:
                 self.summary[loser] = diff
                 handover = self.summary.pop(winner)
                 print str(loser) + " --> " + str(winner) + ": " + str(abs(handover))
+                result += str(loser)+" --> "+str(winner)+": "+str(abs(handover))+"\n"
             else:
                 self.summary.pop(loser)
                 handover = self.summary.pop(winner)
                 print str(loser) + " --> " + str(winner) + ": " + str(abs(handover))
+                result += str(loser)+" --> "+str(winner)+": "+str(abs(handover))+"\n"
 
-        return 0
+        return result
 
 class FreshEntry:
     """
