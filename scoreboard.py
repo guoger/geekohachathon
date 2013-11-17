@@ -26,6 +26,7 @@ class ScoreBoard:
         self.name = name
         self.data = {}
         self.summary = {}
+        print "instantiate scoreboard: " + name
 
     def addMember(self, userName):
         """
@@ -35,6 +36,7 @@ class ScoreBoard:
             print "User exist!"
             return -1
         else:
+            print "Add user: " + userName
             self.data[userName] = {}
             self.summary[userName] = 0
 
@@ -50,9 +52,9 @@ class ScoreBoard:
         """
         calculate current state vector
         """
-        users = userList()
+        users = self.userList()
         for user in users:
-            self.summary[user] = sumUp(self, self.data[user])
+            self.summary[user] = self.sumUp(self.data[user])
             
     def sumUp(self, userVector):
         lose = 0
@@ -63,20 +65,26 @@ class ScoreBoard:
         score = lose + win
         return score
 
-    def addEntry(entry):
+    def addEntry(self, entry):
         """
         Add an entry to scoreboard
         """
-        usersInvolved = entry.keys()
+        print "Add entry: " + entry.name
+        usersInvolved = entry.data.keys()
         for user in usersInvolved:
-            self.data[user][entryName] = entry[user][0]
+            self.data[user][entry.name] = entry.data[user][0]
 
-        return 0
+        self.refresh()
+        return self.summary
 
-    def getUserState(userName):
+    def getUserState(self, userName):
         """
         return a user's state
         """
+        if self.hasUser(userName):
+            return self.data[userName]
+        
+        return -1
 
     def hasUser(self, userName):
         """
@@ -96,14 +104,51 @@ class ScoreBoard:
         If no, return None
         """
 
+    def showState(self):
+        """
+        return current summary state
+        """
+        return self.summary
+
+    def userList(self):
+        """
+        return all users in scoreboard
+        """
+        return self.data.keys()
+
+    def clearUp(self):
+        """
+        calculate how to pay back and clear up
+        """
+        self.refresh()
+        diff = 0
+        while self.summary:
+            winner = max(self.summary, key = lambda x: self.summary.get(x))
+            loser = min(self.summary, key = lambda x: self.summary.get(x))
+            diff = self.summary[winner] + self.summary[loser]
+            if diff > 0:
+                self.summary[winner] = diff
+                handover = self.summary.pop(loser)
+                print str(loser) + " --> " + str(winner) + ": " + str(abs(handover))
+            elif diff < 0:
+                self.summary[loser] = diff
+                handover = self.summary.pop(winner)
+                print str(loser) + " --> " + str(winner) + ": " + str(abs(handover))
+            else:
+                self.summary.pop(loser)
+                handover = self.summary.pop(winner)
+                print str(loser) + " --> " + str(winner) + ": " + str(abs(handover))
+
+        return 0
+
 class FreshEntry:
     """
     a temporary entry for async features
     {
         "peter":
-            [[100, -50], True]
+            [(100, -50), True]
         "J":
-            [[0, -50], False]
+            [(0, -50), False]
     }
     """
     def __init__(self, entryName, scoreBoardName):
@@ -112,23 +157,32 @@ class FreshEntry:
         self.scoreBoardName = scoreBoardName
         self.data = {}
 
-    def checkEntry(self, entryValue):
+    def addValue(self, userName, userValue):
         """
-        To check whether an entry is valid by sum them up
-        TODO: should be implemented at user end?
+        add a value to entry
         """
+        self.data[userName] = [userValue, False]
+
+    def entryIsComplete(self):
+        """
+        To check whether all users confirmed this entry
+        """
+        users = self.data.keys()
+        for user in users:
+            if not self.data[user][1]:
+                return False
+        return True
 
     def confirm(self, userName):
         """
         Confirm a shared expenditure for an user
         """
         if self.hasUser(userName):
-            
+            self.data[userName][1] = True
+        else:
+            return -1
 
-    def commitEntry(self):
-        """
-        Entry is complete, add to scoreboard
-        """
+        return 0
 
     def hasUser(self, userName):
         """
@@ -141,8 +195,28 @@ class FreshEntry:
 
 if __name__=="__main__":
     test = ScoreBoard("test")
-    member = "peter"
-    test.addMember(member)
-    print test
+    test.addMember("peach")
+    test.addMember("j")
+    test.addMember("niklas")
+    test.addMember("akis")
+    test.addMember("ram")
+    test.addMember("wei")
+    entry = FreshEntry("ica", "test")
+    entry.addValue("peach", (100, -50))
+    entry.addValue("j", (0, -10))
+    entry.addValue("niklas", (0, -10))
+    entry.addValue("akis", (0, -10))
+    entry.addValue("ram", (0, -10))
+    entry.addValue("wei", (0, -10))
+    entry.confirm("peach")
+    entry.confirm("j")
+    entry.confirm("akis")
+    entry.confirm("ram")
+    entry.confirm("wei")
+    entry.confirm("niklas")
+    if entry.entryIsComplete():
+        test.addEntry(entry)
+    print test.summary
+    test.clearUp()
 
-
+    
