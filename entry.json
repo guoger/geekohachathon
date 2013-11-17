@@ -1,0 +1,12 @@
+{
+    "messageType": "addEntry",
+    "name": "postcards",
+    "time": "2013 Nov 17",
+    "items": {
+        "peter": -30,
+        "jiannan": -20,
+        "niklas": -10,
+        "wei": -5
+    },
+    "payer": "peter"
+}
