@@ -29,6 +29,7 @@ class ScoreBoard:
         self.summary = {}
         for usr in people:
             self.summary[usr] = 0
+            self.addMember(usr)
         print "instantiate scoreboard: " + name
 
     def addMember(self, userName):
@@ -74,8 +75,13 @@ class ScoreBoard:
         """
         print "Add entry: " + entry.name
         usersInvolved = entry.data.keys()
-        for user in usersInvolved:
-            self.data[user][entry.name] = entry.data[user][0]
+        print usersInvolved
+        print entry
+        for user in self.userList():
+            if user in usersInvolved:
+                self.data[user][entry.name] = entry.data[user][0]
+            else:
+                self.data[user][entry.name] = [0, 0]
 
         self.refresh()
         return self.summary
@@ -111,7 +117,24 @@ class ScoreBoard:
         """
         return current summary state
         """
-        return self.summary
+        fancyPrint = "\t\t"
+        for usr in self.data.keys():
+            fancyPrint += "\t"+usr
+        fancyPrint += "\n"
+        for entry in self.entryList():
+            fancyPrint += entry+"\t"
+            for usr in self.data.keys():
+                fancyPrint += "\t"+str(sum(self.data[usr][entry]))
+            fancyPrint += "\n"
+
+        return fancyPrint
+
+    def entryList(self):
+        """
+        retrieve all entries
+        """
+        usr = self.userList()
+        return self.data[usr[0]].keys()
 
     def userList(self):
         """
@@ -156,7 +179,7 @@ class FreshEntry:
     """
     def __init__(self, entryName, scoreBoardName):
         currentTime = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        self.name = entryName + "|" + currentTime
+        self.name = entryName
         self.scoreBoardName = scoreBoardName
         self.data = {}
 

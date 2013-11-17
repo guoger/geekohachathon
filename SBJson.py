@@ -14,6 +14,7 @@ def createNewSB(msg):
     users = msg.get('people')
     SBs[name] = sb.ScoreBoard(name, users)
     print SBs[name].summary
+    print SBs[name].data
 
 def addEntry(msg):
     """
@@ -24,33 +25,35 @@ def addEntry(msg):
     entry = sb.FreshEntry(entryName, SBName)
     usrInvolved = msg.get("items")
     payer = msg.get("payer")
+    total = 0
+    temp = 0
     for usr in usrInvolved:
         temp = usrInvolved[usr]
         entry.addValue(usr, [0, temp])
         total += temp
 
-    entry.data["payer"][0][0] = total
-
-    entry._autoConfirm()
-    entries[entryName] = entry
-    
+    entry.data[payer][0][0] = abs(total)
     # TODO disseminate notification and confirm
+    entry._autoConfirm()
     if SBs.has_key(SBName):
         SBs.get(SBName).addEntry(entry)
+        print SBs.get(SBName).showState()
 
 def connHandler(conn):
     """
     handling a connection, parse Json message and update scoreboard accordingly
     """
     data = conn.recv(1024)
-    msg = json.loads(data)
-    msgType = msg.get("messageType")
-    if msgType == "init":
-        createNewSB(msg)
-    elif msgType == "addEntry":
-        addEntry(msg)
-    else:
-        print "unknown type of message"
+    raw = data.split("|")
+    for data in raw:
+        msg = json.loads(data)
+        msgType = msg.get("messageType")
+        if msgType == "init":
+            createNewSB(msg)
+        elif msgType == "addEntry":
+            addEntry(msg)
+        else:
+            print "unknown type of message"
 
     conn.close()
 
