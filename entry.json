@@ -1,6 +1,7 @@
 {
+    "SBName": "Amsterdam",
     "messageType": "addEntry",
-    "name": "postcards",
+    "entryName": "postcards",
     "time": "2013 Nov 17",
     "items": {
         "peter": -30,
